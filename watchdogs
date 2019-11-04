@@ -1,0 +1,42 @@
+#!/bin/bash
+
+usage="$(basename "$0") [-h] [-n n] [-d d] -- call dogs to watch over your computer (or just watch dogs if you like that)
+
+where:
+    -h  show this help text
+    -n  set the delay between each dog call (default: 5)
+    -d  if you only trust one dog, set it's number (default: random)"
+
+call=5
+while getopts ':hn:d:' option; do
+  case "$option" in
+    h) echo "$usage"
+       exit
+       ;;
+    n) call=$OPTARG
+       ;;
+    d) trusted_dog=$OPTARG
+       ;;
+    :) printf "missing argument for -%s\n" "$OPTARG" >&2
+       echo "$usage" >&2
+       exit 1
+       ;;
+   \?) printf "not an option: -%s\n" "$OPTARG" >&2
+       echo "$usage" >&2
+       exit 1
+       ;;
+  esac
+done
+
+while true
+do
+    if [ -z ${trusted_dog} ]; then
+	dog_number=$(((RANDOM%40)+1))
+    else
+	dog_number=$trusted_dog
+    fi
+    dog=dogs/dog-$dog_number.ascii
+    # cat the dog
+    cat $dog
+    sleep $call
+done
